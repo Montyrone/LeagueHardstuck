@@ -2,15 +2,36 @@ export default function MatchCard({ match, onEdit, onDelete }) {
   const winLossClass = match.result === 'win' ? 'border-win' : 'border-loss';
   const winLossBg = match.result === 'win' ? 'bg-win/10' : 'bg-loss/10';
 
+  // Build a Data Dragon champion image URL. We sanitize the champion name to remove
+  // spaces and special characters (e.g. "Lee Sin" -> "LeeSin", "Cho'Gath" -> "ChoGath").
+  const ddVersion = '13.23.1'; // pinned version; update if needed
+  const sanitizedChampion = (match.champion || '')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .replace(/\s+/g, '');
+  const championImageUrl = `https://ddragon.leagueoflegends.com/cdn/${ddVersion}/img/champion/${sanitizedChampion}.png`;
+  const placeholder = 'https://via.placeholder.com/40?text=?';
+
   return (
     <div className={`bg-white rounded-lg shadow p-4 border-l-4 ${winLossClass} ${winLossBg}`}>
       <div className="flex justify-between items-start mb-3">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
-            {match.champion} - {match.role}
-          </h3>
-          <div className="text-sm text-gray-500">
-            {new Date(match.created_at).toLocaleDateString()}
+          <div className="flex items-center">
+            <img
+              src={championImageUrl}
+              alt={match.champion}
+              onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = placeholder; }}
+              // 15% larger than 40px (w-10/h-10) -> 46px
+              style={{ width: '46px', height: '46px' }}
+              className="rounded-full mr-3 object-cover"
+            />
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {match.champion} - {match.role}
+              </h3>
+              <div className="text-sm text-gray-500">
+                {new Date(match.created_at).toLocaleDateString()}
+              </div>
+            </div>
           </div>
         </div>
         <div className={`px-3 py-1 rounded-full text-sm font-semibold ${
