@@ -1,6 +1,9 @@
 export default function MatchCard({ match, onEdit, onDelete }) {
   const winLossClass = match.result === 'win' ? 'border-win' : 'border-loss';
-  const winLossBg = match.result === 'win' ? 'bg-win/10' : 'bg-loss/10';
+  // For wins, use a light green background and show a separate light-red accent
+  // as a thin bar on the right so the colors are clearly separated.
+  // For losses keep a light red background.
+  const winLossBg = match.result === 'win' ? 'bg-green-50' : 'bg-red-50';
 
   // Build a Data Dragon champion image URL. We sanitize the champion name to remove
   // spaces and special characters (e.g. "Lee Sin" -> "LeeSin", "Cho'Gath" -> "ChoGath").
@@ -12,7 +15,7 @@ export default function MatchCard({ match, onEdit, onDelete }) {
   const placeholder = 'https://via.placeholder.com/40?text=?';
 
   return (
-    <div className={`bg-white rounded-lg shadow p-4 border-l-4 ${winLossClass} ${winLossBg}`}>
+    <div className={`relative bg-white rounded-lg shadow p-4 border-l-4 ${winLossClass} ${winLossBg} overflow-hidden`}>
       <div className="flex justify-between items-start mb-3">
         <div>
           <div className="flex items-center">
@@ -99,6 +102,10 @@ export default function MatchCard({ match, onEdit, onDelete }) {
           </button>
         )}
       </div>
+      {match.result === 'win' && (
+        // separate light red accent bar on the right for contrast
+        <div className="absolute top-0 right-0 h-full w-3 bg-green-50" aria-hidden="true" />
+      )}
     </div>
   );
 }
