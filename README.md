@@ -1,4 +1,4 @@
-# SummonerSense
+# LeagueHardstuck
 
 A personal web application to help League of Legends players systematically improve by tracking performance, identifying patterns, and turning match data into actionable insights.
 
