@@ -95,6 +95,13 @@ export class Match {
   }
 
   static async delete(id, userId = 1) {
+    // Delete associated match_mistakes first (in case cascade isn't working)
+    await dbRun(`DELETE FROM match_mistakes WHERE match_id = ?`, [id]);
+    
+    // Delete associated goal_matches
+    await dbRun(`DELETE FROM goal_matches WHERE match_id = ?`, [id]);
+    
+    // Delete the match itself
     const sql = `DELETE FROM matches WHERE id = ? AND user_id = ?`;
     return dbRun(sql, [id, userId]);
   }
