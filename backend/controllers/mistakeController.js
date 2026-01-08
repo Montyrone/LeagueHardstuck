@@ -1,4 +1,4 @@
-import { dbAll, dbGet } from '../db/database.js';
+import { dbAll, dbGet, dbRun } from '../db/database.js';
 
 export const getMistakes = async (req, res) => {
   try {
@@ -12,7 +12,13 @@ export const getMistakes = async (req, res) => {
 
 export const getMistakeStats = async (req, res) => {
   try {
-    // Get mistake frequency across all matches
+    // First, clean up any orphaned match_mistakes records (mistakes linked to deleted matches)
+    await dbRun(`
+      DELETE FROM match_mistakes 
+      WHERE match_id NOT IN (SELECT id FROM matches)
+    `);
+
+    // Get mistake frequency across all matches that still exist
     const stats = await dbAll(`
       SELECT 
         m.id,

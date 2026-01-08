@@ -10,6 +10,35 @@ export default function Dashboard() {
 
   useEffect(() => {
     loadDashboardData();
+
+    // Refresh dashboard data when page becomes visible (tab regains focus)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.debug('[Dashboard] visibilitychange: visible -> reloading');
+        loadDashboardData();
+      }
+    };
+
+    // Listen for data update events from other components
+    const handleDataUpdated = (e) => {
+      console.debug('[Dashboard] dataUpdated event received', e?.detail);
+      loadDashboardData();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('dataUpdated', handleDataUpdated);
+
+    // Also reload every 5 seconds to catch any changes from other tabs/windows
+    const interval = setInterval(() => {
+      console.debug('[Dashboard] periodic reload');
+      loadDashboardData();
+    }, 5000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('dataUpdated', handleDataUpdated);
+      clearInterval(interval);
+    };
   }, []);
 
   const loadDashboardData = async () => {
@@ -18,6 +47,8 @@ export default function Dashboard() {
         matchesAPI.getStats(),
         mistakesAPI.getStats(),
       ]);
+      console.debug('[Dashboard] matches stats response:', statsResponse.data);
+      console.debug('[Dashboard] mistakes stats response:', mistakesResponse.data);
       setStats(statsResponse.data);
       setMistakeStats(mistakesResponse.data);
     } catch (error) {

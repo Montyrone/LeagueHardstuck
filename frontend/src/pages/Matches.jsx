@@ -81,6 +81,8 @@ export default function Matches() {
     try {
       await matchesAPI.delete(id);
       await loadMatches();
+      // Notify other components (like Dashboard) that data has changed
+      window.dispatchEvent(new CustomEvent('dataUpdated'));
     } catch (error) {
       console.error('Error deleting match:', error);
       alert('Failed to delete match');
